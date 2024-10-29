@@ -27,7 +27,7 @@ Aplikasi ini menerapkan algoritma Divide and Conquer untuk pemrosesan gambar:
 ---
 
 ### Instalasi dan Penggunaan
-1. **Clone repositori**:
+**Clone repositori**:
    ```bash
    git clone https://github.com/username/Aplikasi-Automatic-Image-Processing.git
    cd Aplikasi-Automatic-Image-Processing
