@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aplikasi Pemrosesan Gambar</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container text-center">
+        <h1 class="mt-5">Aplikasi Pemrosesan Gambar</h1>
+        <form action="/process_image" method="POST" enctype="multipart/form-data" class="mt-4">
+            <div class="form-group">
+                <label for="file">Pilih Gambar:</label>
+                <input type="file" name="file" id="file" accept="image/*" required>
+            </div>
+            <div class="form-group">
+                <label for="action">Pilih Proses:</label>
+                <select name="action" id="action" required>
+                    <option value="threshold">Threshold</option>
+                    <option value="blur">Blur</option>
+                    <option value="black_white">Hitam Putih</option>
+                </select>
+            </div>
+            <div class="form-group" id="blur-options" style="display:none;">
+                <label for="blur_radius">Radius Blur:</label>
+                <input type="number" name="blur_radius" id="blur_radius" min="1" max="10" value="5">
+            </div>
+            <input type="submit" value="Proses Gambar" class="btn btn-primary">
+        </form>
+    </div>
+
+    <script>
+        const actionSelect = document.getElementById('action');
+        const blurOptions = document.getElementById('blur-options');
+
+        actionSelect.addEventListener('change', function() {
+            if (this.value === 'blur') {
+                blurOptions.style.display = 'block';
+            } else {
+                blurOptions.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>
