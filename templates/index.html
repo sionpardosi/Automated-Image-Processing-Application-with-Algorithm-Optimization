@@ -1,46 +1,72 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aplikasi Pemrosesan Gambar</title>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <title>Image Processor</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+        h1 {
+            color: #333;
+        }
+        form {
+            margin: 20px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            display: inline-block;
+        }
+        select, input[type="file"] {
+            margin: 10px 0;
+            padding: 5px;
+        }
+        .result-image {
+            margin-top: 20px;
+        }
+        .result-image img {
+            max-width: 500px;
+            max-height: 500px;
+            border: 1px solid #ddd;
+            padding: 10px;
+        }
+    </style>
 </head>
 <body>
-    <div class="container text-center">
-        <h1 class="mt-5">Aplikasi Pemrosesan Gambar</h1>
-        <form action="/process_image" method="POST" enctype="multipart/form-data" class="mt-4">
-            <div class="form-group">
-                <label for="file">Pilih Gambar:</label>
-                <input type="file" name="file" id="file" accept="image/*" required>
-            </div>
-            <div class="form-group">
-                <label for="action">Pilih Proses:</label>
-                <select name="action" id="action" required>
-                    <option value="threshold">Threshold</option>
-                    <option value="blur">Blur</option>
-                    <option value="black_white">Hitam Putih</option>
-                </select>
-            </div>
-            <div class="form-group" id="blur-options" style="display:none;">
-                <label for="blur_radius">Radius Blur:</label>
-                <input type="number" name="blur_radius" id="blur_radius" min="1" max="10" value="5">
-            </div>
-            <input type="submit" value="Proses Gambar" class="btn btn-primary">
-        </form>
+    <h1>Image Processor</h1>
+    
+    <!-- Form untuk mengunggah gambar dan memilih efek -->
+    <form action="{{ url_for('process') }}" method="post" enctype="multipart/form-data">
+        <label for="image">Upload an image:</label>
+        <input type="file" name="image" id="image" required>
+        
+        <label for="effect">Choose an effect:</label>
+        <select name="effect" id="effect" required>
+            <option value="black_white">Black & White</option>
+            <option value="blur">Blur</option>
+            <option value="invert">Invert (Negative)</option>
+            <option value="sepia">Sepia</option>
+            <option value="emboss">Emboss</option>
+            <option value="sharpen">Sharpen</option>
+            <option value="brighten">Brighten</option>
+            <option value="vignette">Vignette</option>
+            <option value="cartoon">Cartoon</option>
+            <option value="glow">Glow</option> <!-- Tambahkan ini -->
+            <option value="hdr">HDR</option>
+            <option value="pencil_sketch">Pencil Sketch</option>
+        </select>
+        
+        
+        <button type="submit">Process Image</button>
+    </form>
+    
+    <!-- Menampilkan gambar hasil jika ada -->
+    {% if result_image %}
+    <div class="result-image">
+        <h2>Processed Image:</h2>
+        <img src="{{ url_for('static', filename='processed_image.jpg') }}" alt="Processed Image">
     </div>
-
-    <script>
-        const actionSelect = document.getElementById('action');
-        const blurOptions = document.getElementById('blur-options');
-
-        actionSelect.addEventListener('change', function() {
-            if (this.value === 'blur') {
-                blurOptions.style.display = 'block';
-            } else {
-                blurOptions.style.display = 'none';
-            }
-        });
-    </script>
+    {% endif %}
 </body>
 </html>
