@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="titlehiput">
+    <h1>Pemrosesan Gambar dengan Efek Hitam Putih</h1>
+</div>
+
+<form method="POST" action="{{ url_for('black_and_white_image') }}" enctype="multipart/form-data" class="form">
+    <div class="form-group">
+        <label for="file">Pilih Gambar:</label>
+        <input type="file" name="file" accept=".jpg, .jpeg, .png" required>
+    </div>
+
+    <div class="form-group">
+        <label for="new_width">Lebar:</label>
+        <input type="number" id="new_width" name="new_width" min="1" value="800" required>
+    </div>
+
+    <div class="form-group">
+        <label for="new_height">Tinggi:</label>
+        <input type="number" id="new_height" name="new_height" min="1" value="600" required>
+    </div>
+
+    <button type="submit">Upload</button>
+</form>
+
+{% if result_image %}
+    <div class="result-section">
+        <h2>Gambar yang Telah Diubah Menjadi Hitam-Putih</h2>
+        <img src="{{ result_image }}" alt="Gambar yang Telah Diubah Menjadi Hitam-Putih">
+        <a href="{{ url_for('download_file', filename='bw_' + unique_filename) }}" download class="download-button">
+            <button>Unduh Gambar</button>
+        </a>
+    </div>
+{% endif %}
+
+<p>{{ message }}</p>
+{% endblock %}

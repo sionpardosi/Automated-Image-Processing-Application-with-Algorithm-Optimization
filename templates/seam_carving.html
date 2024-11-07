@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="titleseam">
+    <h1>Pemrosesan Gambar dengan Seam Carving</h1>
+</div>
+
+<form method="POST" action="{{ url_for('seam_carving') }}" enctype="multipart/form-data">
+    <label for="file">Pilih Gambar:</label>
+    <input type="file" name="file" accept=".jpg, .jpeg, .png" required>
+    <label for="new_width">Lebar Baru:</label>
+    <input type="number" id="new_width" name="new_width" min="1" value="800" required>
+    <label for="new_height">Tinggi Baru:</label>
+    <input type="number" id="new_height" name="new_height" min="1" value="600" required>
+    <button type="submit">Upload and Process</button>
+</form>
+
+{% if result_image %}
+    <div class="result-section">
+        <h2>Gambar yang Telah Diproses dengan Seam Carving</h2>
+        <img src="{{ result_image }}" alt="Gambar yang Telah Diproses dengan Seam Carving">
+        <a href="{{ url_for('download_file', filename='seam_carving_result.jpg') }}" download>
+            <button>Unduh Gambar</button>
+        </a>
+    </div>
+{% endif %}
+
+<p>{{ message }}</p>
+{% endblock %}
