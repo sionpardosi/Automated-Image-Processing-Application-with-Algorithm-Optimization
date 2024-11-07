@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Choose Compression</title>
+</head>
+<body>
+    <h1>Choose Compression Level for Your Image</h1>
+
+    <p>Original file size: {{ file_size }} KB</p>
+    <form action="/compress" method="POST">
+        <label for="compression_ratio">Select Compression Level:</label><br><br>
+
+        {% for label, ratio in compression_options.items() %}
+            <input type="radio" id="{{ label }}" name="compression_ratio" value="{{ ratio }}" required>
+            <label for="{{ label }}">{{ label }}</label><br>
+        {% endfor %}
+
+        <input type="hidden" name="filename" value="{{ filename }}">
+
+        <br><br>
+        <button type="submit">Compress Image</button>
+    </form>
+</body>
+</html>

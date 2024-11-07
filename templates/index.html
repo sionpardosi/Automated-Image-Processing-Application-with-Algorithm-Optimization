@@ -3,87 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Image Crop and Resize</title>
-    <style>
-        /* Simple styling for the form and result image */
-        body {
-            font-family: Arial, sans-serif;
-            padding: 20px;
-        }
-        .form-container {
-            max-width: 600px;
-            margin: 0 auto;
-            padding: 20px;
-            background-color: #f9f9f9;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
-        input[type="file"], input[type="number"], input[type="submit"] {
-            width: 100%;
-            padding: 10px;
-            margin: 10px 0;
-            border-radius: 4px;
-            border: 1px solid #ccc;
-        }
-        img {
-            max-width: 100%;
-            height: auto;
-            margin-top: 20px;
-        }
-        .message {
-            color: red;
-            font-weight: bold;
-        }
-    </style>
+    <title>Image Optimizer</title>
 </head>
 <body>
-    <div class="form-container">
-        <h2>Upload Image, Crop and Resize</h2>
-        <form action="{{ url_for('crop_and_resize') }}" method="POST" enctype="multipart/form-data">
-            <input type="file" name="file" required><br><br>
+    <h1>Optimize Image for Target File Size</h1>
+    <form action="/upload" method="POST" enctype="multipart/form-data">
+        <label for="file">Choose an image:</label>
+        <input type="file" name="file" required><br><br>
 
-            <!-- Crop data, hidden for JS to update -->
-            <input type="hidden" id="crop_data" name="crop_data">
+        <p>The system will automatically compress the image to a smaller size (50% of original size or less).</p>
 
-            <label for="crop_width">Crop Width:</label>
-            <input type="number" name="crop_width" value="200" required><br>
-            
-            <label for="crop_height">Crop Height:</label>
-            <input type="number" name="crop_height" value="200" required><br><br>
-
-            <label for="resize_width">Resize Width:</label>
-            <input type="number" name="resize_width" value="100" required><br>
-            
-            <label for="resize_height">Resize Height:</label>
-            <input type="number" name="resize_height" value="100" required><br><br>
-
-            <input type="submit" value="Process Image">
-        </form>
-
-        {% if result_image %}
-            <h3>Processed Image</h3>
-            <img src="{{ result_image }}" alt="Processed Image">
-        {% endif %}
-        
-        {% if message %}
-            <p class="message">{{ message }}</p>
-        {% endif %}
-    </div>
-
-    <script>
-        // Example of a simple JavaScript to capture the crop data (could be extended)
-        // This is a mock-up, replace with actual cropping tool logic
-
-        // For demo, set crop data manually
-        let cropData = {
-            left: 50,
-            top: 50,
-            width: 200,
-            height: 200
-        };
-
-        // Update the hidden field with crop data
-        document.getElementById('crop_data').value = JSON.stringify(cropData);
-    </script>
+        <button type="submit">Optimize Image</button>
+    </form>
 </body>
 </html>
