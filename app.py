@@ -107,6 +107,10 @@ def upload_file():
                            fixed_options=fixed_options,
                            filename=file.filename)
 
+@app.route('/uploads/<filename>')
+def uploaded_file(filename):
+    return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
+
 @app.route('/compress', methods=['POST'])
 def compress_image():
     # Get the target size selected by the user (in MB)

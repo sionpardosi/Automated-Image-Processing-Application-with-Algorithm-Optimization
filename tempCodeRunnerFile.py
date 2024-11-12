@@ -2,7 +2,6 @@ from flask import Flask, render_template, request, send_from_directory
 from PIL import Image
 import os
 
-# Initialize Flask app
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = 'uploads'
 
@@ -10,55 +9,39 @@ app.config['UPLOAD_FOLDER'] = 'uploads'
 if not os.path.exists(app.config['UPLOAD_FOLDER']):
     os.makedirs(app.config['UPLOAD_FOLDER'])
 
-def optimize_image_to_target_size(input_path, output_path, target_size_mb):
+def optimize_image(input_path, output_path, target_size_kb):
     """
-    Optimize an image to reach a target file size by adjusting quality and resolution.
+    Optimize an image to achieve a target size using a greedy approach.
     
     Parameters:
     - input_path: Path to the input image
     - output_path: Path to save the optimized image
-    - target_size_mb: Target file size in MB
+    - target_size_kb: Target file size in KB
     """
-    # Convert target size from MB to KB (1 MB = 1024 KB)
-    target_size_kb = target_size_mb * 1024
-
-    # Get the size of the original image (in KB)
-    original_size_kb = os.path.getsize(input_path) / 1024  # Convert bytes to KB
-    print(f"Original file size: {original_size_kb:.2f} KB")
-
-    # Check if target size is greater than the original size
-    if target_size_kb > original_size_kb:
-        return f"Target size {target_size_mb} MB cannot be greater than the original file size of {original_size_kb:.2f} KB", 400
-
     with Image.open(input_path) as img:
-        # Convert RGBA images to RGB to handle JPEG format compatibility
         if img.mode == 'RGBA':
             img = img.convert('RGB')
 
-        # Start by checking the resolution of the image
-        img_width, img_height = img.size
-        target_width = int(img_width * 0.8)  # Reducing width by 20%
-        target_height = int(img_height * 0.8)  # Reducing height by 20%
-        
-        # If the image width is larger than the threshold, resize it
-        if img_width > 1024:
-            img = img.resize((target_width, target_height), Image.LANCZOS)
-
-        # Start with high quality
+        # Start with high quality and reduce quality in greedy steps
         quality = 95
         img.save(output_path, format="JPEG", quality=quality, optimize=True)
 
-        # Reduce quality iteratively until the file size is close to target_size_kb but not larger than original size
+        # Greedy approach: reduce quality in increments of 5 until target size is reached or quality is too low
         while os.path.getsize(output_path) > target_size_kb * 1024 and quality > 10:
-            quality -= 5  # Decrease quality in steps
+            # Greedy step: lower the quality by 5 and check file size
+            quality -= 5
             img.save(output_path, format="JPEG", quality=quality, optimize=True)
 
-        # Ensure file size does not exceed original size
-        if os.path.getsize(output_path) > original_size_kb * 1024:
-            os.remove(output_path)  # Remove the file if it exceeds original size
-            return f"Could not compress image to the desired size without exceeding original file size ({original_size_kb:.2f} KB).", 400
+            # Log the current file size to understand the effect of each greedy step
+            current_size_kb = os.path.getsize(output_path) / 1024
+            print(f"Quality: {quality} | Current file size: {current_size_kb:.2f} KB")
 
-    return None
+        # Check if the current file size is close to the target size
+        if abs(os.path.getsize(output_path) / 1024 - target_size_kb) <= 5:
+            print("Optimized size is within 5 KB of the target.")
+
+    return output_path
+
 
 @app.route('/')
 def index():
@@ -73,22 +56,76 @@ def upload_file():
     if file.filename == '':
         return "No file selected", 400
 
-    # Save the original uploaded file
     original_path = os.path.join(app.config['UPLOAD_FOLDER'], file.filename)
     file.save(original_path)
 
-    # Retrieve user-specified target size (in MB) and validate input
-    target_size_mb = float(request.form.get('target_size_mb', 1))  # Default to 1 MB if not specified
+    # Calculate the file size in KB
+    original_size_kb = os.path.getsize(original_path) / 1024  # KB
+    print(f"File size before compression: {original_size_kb:.2f} KB")
 
-    # Call the function to optimize image and check for error
-    optimized_path = os.path.join(app.config['UPLOAD_FOLDER'], 'optimized_' + file.filename)
-    error_message = optimize_image_to_target_size(original_path, optimized_path, target_size_mb)
+    # Calculate the compression options dynamically based on original size
+    compression_options = {}
+    for percent in [20, 30, 40, 50, 60, 70, 80, 90, 95]:
+        target_size_kb = original_size_kb * (percent / 100)
+        compression_options[f"{percent}%"] = round(target_size_kb / 1024, 2)  # Convert to MB for display
 
-    if error_message:
-        return error_message
+    # Add fixed options if they are smaller than or equal to the original size
+    fixed_options = {}
+    possible_fixed_options = {
+        "100 KB": 0.1,
+        "200 KB": 0.2,
+        "300 KB": 0.3,
+        "400 KB": 0.4,
+        "500 KB": 0.5,
+        "600 KB": 0.6,
+        "700 KB": 0.7,
+        "800 KB": 0.8,
+        "900 KB": 0.9,
+        "1 MB": 1,
+        "2 MB": 2,
+        "3 MB": 3,
+        "4 MB": 4,
+        "5 MB": 5,
+        "6 MB": 6,
+        "7 MB": 7,
+        "8 MB": 8,
+        "9 MB": 9,
+        "10 MB": 10,
+        "12 MB": 12,
+        "15 MB": 15,
+        "20 MB": 20
+    }
 
-    # Return the optimized image for download
-    return send_from_directory(app.config['UPLOAD_FOLDER'], 'optimized_' + file.filename, as_attachment=True)
+    for label, size_mb in possible_fixed_options.items():
+        if size_mb * 1024 <= original_size_kb:  # Only include options <= original size
+            fixed_options[label] = size_mb
+
+    # Render the template with calculated options
+    return render_template('choose_compression.html', 
+                           file_size=original_size_kb, 
+                           compression_options=compression_options, 
+                           fixed_options=fixed_options,
+                           filename=file.filename)
+
+@app.route('/uploads/<filename>')
+def uploaded_file(filename):
+    return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
+
+@app.route('/compress', methods=['POST'])
+def compress_image():
+    # Get the target size selected by the user (in MB)
+    target_size_mb = float(request.form['target_size_mb'])
+    target_size_kb = int(target_size_mb * 1024)  # Convert MB to KB
+    filename = request.form['filename']
+
+    original_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+    optimized_path = os.path.join(app.config['UPLOAD_FOLDER'], 'optimized_' + filename)
+
+    # Perform the compression based on the selected target size
+    output_path = optimize_image(original_path, optimized_path, target_size_kb)
+
+    # Return the optimized file to the user
+    return send_from_directory(app.config['UPLOAD_FOLDER'], 'optimized_' + filename, as_attachment=True)
 
 if __name__ == "__main__":
     app.run(debug=True)
