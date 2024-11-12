@@ -124,8 +124,17 @@ def compress_image():
     # Perform the compression based on the selected target size
     output_path = optimize_image(original_path, optimized_path, target_size_kb)
 
-    # Return the optimized file to the user
-    return send_from_directory(app.config['UPLOAD_FOLDER'], 'optimized_' + filename, as_attachment=True)
+    # Calculate final compressed file size in KB and MB
+    compressed_size_kb = os.path.getsize(output_path) / 1024
+    compressed_size_mb = compressed_size_kb / 1024
+
+    # Pass the compressed size to the template along with the download
+    return render_template('download.html',
+                           compressed_file='optimized_' + filename,
+                           compressed_size_kb=compressed_size_kb,
+                           compressed_size_mb=compressed_size_mb,
+                           original_size_kb=target_size_kb)
+
 
 if __name__ == "__main__":
     app.run(debug=True)
