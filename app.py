@@ -11,7 +11,7 @@ if not os.path.exists(app.config['UPLOAD_FOLDER']):
 
 def optimize_image(input_path, output_path, target_size_kb):
     """
-    Optimize an image to achieve a target size.
+    Optimize an image to achieve a target size using a greedy approach.
     
     Parameters:
     - input_path: Path to the input image
@@ -22,15 +22,26 @@ def optimize_image(input_path, output_path, target_size_kb):
         if img.mode == 'RGBA':
             img = img.convert('RGB')
 
+        # Start with high quality and reduce quality in greedy steps
         quality = 95
         img.save(output_path, format="JPEG", quality=quality, optimize=True)
 
-        # Decrease quality until target size is reached or quality is too low
+        # Greedy approach: reduce quality in increments of 5 until target size is reached or quality is too low
         while os.path.getsize(output_path) > target_size_kb * 1024 and quality > 10:
+            # Greedy step: lower the quality by 5 and check file size
             quality -= 5
             img.save(output_path, format="JPEG", quality=quality, optimize=True)
 
+            # Log the current file size to understand the effect of each greedy step
+            current_size_kb = os.path.getsize(output_path) / 1024
+            print(f"Quality: {quality} | Current file size: {current_size_kb:.2f} KB")
+
+        # Check if the current file size is close to the target size
+        if abs(os.path.getsize(output_path) / 1024 - target_size_kb) <= 5:
+            print("Optimized size is within 5 KB of the target.")
+
     return output_path
+
 
 @app.route('/')
 def index():
