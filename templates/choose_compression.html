@@ -1,20 +1,29 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Choose Compression</title>
 </head>
+
 <body>
-    <h1>Choose Compression Level for Your Image</h1>
+    <h1>Select Target File Size for Your Image</h1>
 
     <p>Original file size: {{ file_size }} KB</p>
-    <form action="/compress" method="POST">
-        <label for="compression_ratio">Select Compression Level:</label><br><br>
+    <p>Choose one of the following options for the target size:</p>
 
-        {% for label, ratio in compression_options.items() %}
-            <input type="radio" id="{{ label }}" name="compression_ratio" value="{{ ratio }}" required>
-            <label for="{{ label }}">{{ label }}</label><br>
+    <form action="/compress" method="POST">
+        <!-- Add fixed options for 1 MB and 500 KB -->
+        {% for label, size_mb in fixed_options.items() %}
+        <input type="radio" id="{{ label }}" name="target_size_mb" value="{{ size_mb }}" required>
+        <label for="{{ label }}">{{ label }}</label><br>
+        {% endfor %}
+
+        <!-- Display dynamically generated percentage-based options -->
+        {% for label, size_mb in compression_options.items() %}
+        <input type="radio" id="{{ label }}" name="target_size_mb" value="{{ size_mb }}" required>
+        <label for="{{ label }}">{{ label }} - {{ size_mb }} MB</label><br>
         {% endfor %}
 
         <input type="hidden" name="filename" value="{{ filename }}">
@@ -23,4 +32,5 @@
         <button type="submit">Compress Image</button>
     </form>
 </body>
+
 </html>
