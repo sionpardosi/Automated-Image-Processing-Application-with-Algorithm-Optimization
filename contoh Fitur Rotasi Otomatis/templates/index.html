@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Filters</title>
+</head>
+<body>
+    <h1>Upload Image and Apply Filter</h1>
+
+    <form action="/" method="POST" enctype="multipart/form-data">
+        <input type="file" name="file" required><br>
+        <select name="filter" required>
+            <option value="grayscale">Grayscale</option>
+            <option value="sepia">Sepia</option>
+            <option value="adaptive_contrast">Adaptive Contrast</option>
+            <option value="edge_detection">Edge Detection</option>
+            <option value="blur_reduction">Blur Reduction</option>
+        </select><br>
+        <input type="submit" value="Apply Filter">
+    </form>
+
+    {% if uploaded_image %}
+    <h2>Uploaded Image:</h2>
+    <img src="{{ uploaded_image }}" alt="Uploaded Image" width="300"><br>
+
+    <h2>Filtered Image:</h2>
+    <img src="{{ filtered_image }}" alt="Filtered Image" width="300">
+    {% endif %}
+</body>
+</html>
