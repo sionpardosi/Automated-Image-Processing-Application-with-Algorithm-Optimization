@@ -1,5 +1,15 @@
 # Aplikasi Automatic Image Processing
 
+### <summary><strong>Tools:</strong></summary>
+<p>
+    <img src="https://img.shields.io/badge/Language-Python-blue?logo=python&logoColor=white" />
+    <img src="https://img.shields.io/badge/Algorithm-Divide%20and%20Conquer-orange?logo=python&logoColor=white" />
+    <img src="https://img.shields.io/badge/Library-Numpy-green?logo=numpy&logoColor=white" />
+    <img src="https://img.shields.io/badge/Library-OpenCV-blue?logo=opencv&logoColor=white" />
+    <img src="https://img.shields.io/badge/Library-Pillow-5A5A5A?logo=pillow&logoColor=white" />
+    <img src="https://img.shields.io/badge/Platform-iOS-lightgrey?logo=apple&logoColor=white" />
+</p>
+
 ## Deskripsi Proyek
 Aplikasi ini dikembangkan untuk memungkinkan pemrosesan gambar otomatis yang efisien, memungkinkan pengguna dengan cepat mengonversi foto menjadi hitam-putih (biner) atau menambahkan efek blur. Menggunakan algoritma Divide and Conquer, aplikasi membagi gambar menjadi blok-blok kecil dan memproses setiap blok secara independen, menghasilkan hasil akhir yang berkualitas tinggi. Pengguna dapat dengan mudah menerapkan efek langsung pada foto yang diambil melalui aplikasi, didukung antarmuka sederhana dan interaktif yang dirancang untuk memberikan pengalaman pengguna yang nyaman dan menyenangkan.
 
