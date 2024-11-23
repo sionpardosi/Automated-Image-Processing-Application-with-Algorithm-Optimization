@@ -1,4 +1,4 @@
-# Aplikasi Automatic Image Processing - on progress
+# Automated Image Processing Application with Algorithm Optimization - on progress
 
 ### <summary><strong>Tools:</strong></summary>
 <p>
