@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resize Your Image</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f7fc;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            background-color: white;
+            width: 100%;
+            max-width: 800px;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        h1 {
+            color: #4CAF50;
+            margin-bottom: 30px;
+            font-size: 28px;
+            font-weight: 700;
+        }
+
+        input[type="file"],
+        input[type="number"],
+        button {
+            padding: 12px 20px;
+            margin: 15px 0;
+            width: 80%;
+            max-width: 400px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            box-sizing: border-box;
+            font-size: 16px;
+        }
+
+        input[type="file"] {
+            background-color: #f9f9f9;
+            cursor: pointer;
+        }
+
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        .img-container {
+            display: none;
+            margin-top: 20px;
+        }
+
+        .img-container img {
+            margin: 15px 0;
+            max-width: 100%; /* Make the image responsive */
+            height: auto;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .output {
+            margin-top: 30px;
+            font-size: 18px;
+            text-align: center;
+        }
+
+        .output a button {
+            background-color: #008CBA;
+            margin-top: 20px;
+        }
+
+        .output a button:hover {
+            background-color: #007B8B;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+
+            input[type="number"] {
+                width: 100%;
+            }
+
+            button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Resize Your Image</h1>
+
+    <form action="/" method="POST" enctype="multipart/form-data">
+        <!-- Input for Image File -->
+        <input type="file" name="file" id="fileInput" onchange="loadImage(event)" required>
+
+        <div class="img-container" id="imgContainer">
+            <h3>Uploaded Image:</h3>
+            <img id="uploadedImage" src="" alt="Uploaded Image">
+            <p id="imageSize"></p> <!-- Displays image dimensions -->
+        </div>
+
+        <h3>Enter New Size (in pixels):</h3>
+        <input type="number" name="new_width" id="newWidth" placeholder="New Width (px)" required>
+        <input type="number" name="new_height" id="newHeight" placeholder="New Height (px)" required>
+
+        <br>
+        <button type="submit">Resize Image</button>
+    </form>
+
+    <div class="output">
+        {% if resized_image %}
+            <h3>Resized Image:</h3>
+            <div class="img-container">
+                <img src="{{ url_for('static', filename='resized/' + resized_image) }}" alt="Resized Image">
+            </div>
+            <p>New Size: {{ new_width }} x {{ new_height }}</p>
+            <a href="{{ url_for('download_file', filename=resized_image) }}">
+                <button>Download Resized Image</button>
+            </a>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+    function loadImage(event) {
+        const file = event.target.files[0];
+        const reader = new FileReader();
+
+        reader.onload = function(e) {
+            const img = new Image();
+            img.onload = function() {
+                // Set the image source and display dimensions
+                document.getElementById('uploadedImage').src = e.target.result;
+                document.getElementById('imageSize').textContent = `Dimensions: ${img.width} x ${img.height} pixels`;
+
+                // Show the image container
+                document.getElementById('imgContainer').style.display = 'block';
+
+                // Enable input fields for width and height
+                document.getElementById('newWidth').removeAttribute("disabled");
+                document.getElementById('newHeight').removeAttribute("disabled");
+
+                // Set the minimal values for width and height to the current size of the image
+                // Now, this will allow for values less than the original image size.
+                document.getElementById('newWidth').setAttribute("min", 1); // Allow values below original size
+                document.getElementById('newHeight').setAttribute("min", 1); // Allow values below original size
+            }
+            img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+    }
+</script>
+
+</body>
+</html>

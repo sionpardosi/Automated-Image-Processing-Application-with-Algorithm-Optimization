@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Apply Filters</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            margin: 0;
+            padding: 20px;
+        }
+        h1, h2 {
+            text-align: center;
+            color: #333;
+        }
+        .image-container {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin: 30px 0;
+        }
+        img {
+            max-width: 300px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+        }
+        form {
+            text-align: center;
+            margin-top: 20px;
+        }
+        select, button {
+            padding: 10px;
+            font-size: 16px;
+            margin: 5px;
+        }
+        button {
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        a.download-button {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 12px 20px;
+            background-color: #28a745;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        a.download-button:hover {
+            background-color: #218838;
+        }
+    </style>
+</head>
+<body>
+    <h1>Apply Filters to Your Image</h1>
+
+    <!-- Tampilkan gambar asli dan gambar hasil filter -->
+    <div class="image-container">
+        <div>
+            <h2>Original Image</h2>
+            <!-- Tampilkan gambar asli -->
+            <img src="{{ url_for('static', filename='uploads/' + original) }}" alt="Original Image">
+        </div>
+        {% if filtered %}
+        <div>
+            <h2>Filtered Image</h2>
+            <!-- Tampilkan gambar yang sudah difilter -->
+            <img src="{{ url_for('static', filename='output/' + filtered) }}" alt="Filtered Image">
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Formulir untuk memilih filter dan mengapply -->
+    <form method="post">
+        <label for="filter">Select Filter:</label>
+        <select name="filter" id="filter" required>
+            <option value="blur">Blur (Divide and Conquer)</option>
+            <option value="grayscale">Grayscale (Iterative)</option>
+            <option value="sharpen">Sharpen (Divide and Conquer)</option>
+            <option value="sepia">Sepia (Iterative)</option>
+            <option value="edge_detection">Edge Detection (Dynamic Programming)</option>
+            <option value="selective_filter">Selective Filter (Backtracking)</option>
+        </select>
+        <br><br>
+        <button type="submit">Apply Filter</button>
+    </form>
+
+    {% if filtered %}
+    <!-- Tampilkan tombol untuk mendownload gambar yang sudah difilter -->
+    <div style="text-align: center;">
+        <a class="download-button" href="{{ url_for('static', filename='output/' + filtered) }}" download>Download Filtered Image</a>
+    </div>
+    {% endif %}
+</body>
+</html>
