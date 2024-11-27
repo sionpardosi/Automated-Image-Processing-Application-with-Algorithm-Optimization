@@ -1,4 +1,14 @@
-# Aplikasi Automatic Image Processing
+# Automated Image Processing Application with Algorithm Optimization - on progress
+
+### <summary><strong>Tools:</strong></summary>
+<p>
+    <img src="https://img.shields.io/badge/Language-Python-blue?logo=python&logoColor=white" />
+    <img src="https://img.shields.io/badge/Algorithm-Divide%20and%20Conquer-orange?logo=python&logoColor=white" />
+    <img src="https://img.shields.io/badge/Library-Numpy-green?logo=numpy&logoColor=white" />
+    <img src="https://img.shields.io/badge/Library-OpenCV-blue?logo=opencv&logoColor=white" />
+    <img src="https://img.shields.io/badge/Library-Pillow-5A5A5A?logo=pillow&logoColor=white" />
+    <img src="https://img.shields.io/badge/Platform-iOS-lightgrey?logo=apple&logoColor=white" />
+</p>
 
 ## Deskripsi Proyek
 Aplikasi ini dikembangkan untuk memungkinkan pemrosesan gambar otomatis yang efisien, memungkinkan pengguna dengan cepat mengonversi foto menjadi hitam-putih (biner) atau menambahkan efek blur. Menggunakan algoritma Divide and Conquer, aplikasi membagi gambar menjadi blok-blok kecil dan memproses setiap blok secara independen, menghasilkan hasil akhir yang berkualitas tinggi. Pengguna dapat dengan mudah menerapkan efek langsung pada foto yang diambil melalui aplikasi, didukung antarmuka sederhana dan interaktif yang dirancang untuk memberikan pengalaman pengguna yang nyaman dan menyenangkan.
@@ -28,6 +38,16 @@ Aplikasi ini menerapkan algoritma Divide and Conquer untuk pemrosesan gambar:
 
 ### Instalasi dan Penggunaan
 **Clone repositori**:
-   ```bash
-   git clone https://github.com/username/Aplikasi-Automatic-Image-Processing.git
-   cd Aplikasi-Automatic-Image-Processing
+    ```bash
+git clone https://github.com/username/Aplikasi-Automatic-Image-Processing.git
+cd Aplikasi-Automatic-Image-Processing
+
+## Contribution & Feedback:
+We are very open to contributions and feedback from the community. For more information or any questions, feel free to contact us via [spardosi12@gmail.com](mailto:spardosi12@gmail.com) or connect with me on [LinkedIn](https://www.linkedin.com/in/sion-pardosi-961607254/).
+
+## License
+
+This project is licensed under the [MIT License](LICENSE).
+
+
+
