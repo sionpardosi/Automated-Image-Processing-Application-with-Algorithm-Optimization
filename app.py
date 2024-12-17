@@ -1,140 +1,233 @@
-from flask import Flask, render_template, request, send_from_directory
-from PIL import Image
+from flask import Flask, render_template, request, send_from_directory, redirect, url_for
 import os
+from werkzeug.utils import secure_filename
+from PIL import ImageOps
+from PIL import Image  # Untuk fitur resize
+from PIL import Image, ImageFilter
+from compress import optimize_image  # Fungsi kompresi eksternal
+from filters import blur_divide_and_conquer, grayscale_iterative, sharpen_divide_and_conquer, sepia_iterative, edge_detection_dp, selective_filter_backtracking
 
 app = Flask(__name__)
-app.config['UPLOAD_FOLDER'] = 'uploads'
+app.config['UPLOAD_FOLDER'] = 'static/uploads'
+app.config['OUTPUT_FOLDER'] = 'static/filtered'
+app.config['ALLOWED_EXTENSIONS'] = {'png', 'jpg', 'jpeg', 'gif'}
 
-# Ensure upload folder exists   
+# Pastikan folder upload dan output ada
 if not os.path.exists(app.config['UPLOAD_FOLDER']):
     os.makedirs(app.config['UPLOAD_FOLDER'])
-
-def optimize_image(input_path, output_path, target_size_kb):
-    """
-    Optimize an image to achieve a target size using a greedy approach.
+if not os.path.exists(app.config['OUTPUT_FOLDER']):
+    os.makedirs(app.config['OUTPUT_FOLDER'])
     
-    Parameters:
-    - input_path: Path to the input image
-    - output_path: Path to save the optimized image
-    - target_size_kb: Target file size in KB
-    """
-    with Image.open(input_path) as img:
-        if img.mode == 'RGBA':
-            img = img.convert('RGB')
+    os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+os.makedirs(app.config['OUTPUT_FOLDER'], exist_ok=True)
 
-        # Start with high quality and reduce quality in greedy steps
-        quality = 95
-        img.save(output_path, format="JPEG", quality=quality, optimize=True)
-
-        # Greedy approach: reduce quality in increments of 5 until target size is reached or quality is too low
-        while os.path.getsize(output_path) > target_size_kb * 1024 and quality > 10:
-            # Greedy step: lower the quality by 5 and check file size
-            quality -= 5
-            img.save(output_path, format="JPEG", quality=quality, optimize=True)
-
-            # Log the current file size to understand the effect of each greedy step
-            current_size_kb = os.path.getsize(output_path) / 1024
-            print(f"Quality: {quality} | Current file size: {current_size_kb:.2f} KB")
-
-        # Check if the current file size is close to the target size
-        if abs(os.path.getsize(output_path) / 1024 - target_size_kb) <= 5:
-            print("Optimized size is within 5 KB of the target.")
-
-    return output_path
-
+def allowed_file(filename):
+    """Periksa apakah file memiliki ekstensi yang diizinkan."""
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in app.config['ALLOWED_EXTENSIONS']
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    """Halaman utama."""
+    return render_template('home.html')
+
+
+# -------------------
+# Fitur Kompresi Gambar
+# -------------------
+@app.route('/compress', methods=['GET', 'POST'])
+def compress():
+    """Tampilkan halaman upload dan opsi kompresi."""
+    if request.method == 'POST':
+        file = request.files.get('file')
+
+        if not file or file.filename == '':
+            return "No file uploaded or file name empty", 400
+        if not allowed_file(file.filename):
+            return "File type not allowed", 400
+
+        filename = secure_filename(file.filename)
+        original_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        file.save(original_path)
+
+        original_size_kb = os.path.getsize(original_path) / 1024
+
+        # Generate opsi kompresi
+        compression_options = {f"{percent}%": round(original_size_kb * (percent / 100), 2)
+                               for percent in [20, 30, 40, 50, 60, 70, 80, 90, 95]}
+
+        fixed_options = {
+            "100 KB": 0.1, "200 KB": 0.2, "300 KB": 0.3,
+            "400 KB": 0.4, "500 KB": 0.5, "1 MB": 1, "2 MB": 2, "3 MB": 3
+        }
+        fixed_options = {label: size for label, size in fixed_options.items() if size * 1024 <= original_size_kb}
+
+        return render_template('compress/choose_compress.html', filename=filename, file_size=round(original_size_kb, 2),
+                               compression_options=compression_options, fixed_options=fixed_options, compressed=False)
+
+    return render_template('compress/compress.html')
+
+
+@app.route('/compress_image', methods=['POST'])
+def compress_image():
+    """Proses kompresi gambar."""
+    filename = request.form.get('filename')
+    target_size_mb = float(request.form.get('target_size_mb', 0))
+
+    if not filename or not target_size_mb:
+        return "Invalid input data", 400
+
+    original_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+    compressed_path = os.path.join(app.config['UPLOAD_FOLDER'], f"compressed_{filename}")
+
+    # Optimalkan gambar ke ukuran target
+    target_size_kb = target_size_mb * 1024
+    optimize_image(original_path, compressed_path, target_size_kb)
+
+    compressed_size_kb = os.path.getsize(compressed_path) / 1024
+
+    return render_template('compress/choose_compress.html', filename=filename, file_size=round(target_size_kb, 2),
+                           compressed=True, compressed_size=round(compressed_size_kb, 2),
+                           download_filename=f"compressed_{filename}")
+
+
+# -------------------
+# Fitur Resize Gambar
+# -------------------
+@app.route('/resize', methods=['GET', 'POST'])
+def resize():
+    """Fitur resize gambar."""
+    if request.method == 'POST':
+        file = request.files.get('file')
+
+        if not file or file.filename == '':
+            return "No file uploaded or file name empty", 400
+        if not allowed_file(file.filename):
+            return "File type not allowed", 400
+
+        filename = secure_filename(file.filename)
+        original_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        file.save(original_path)
+
+        width = request.form.get('width', type=int)
+        height = request.form.get('height', type=int)
+
+        if not width or not height:
+            return "Invalid width or height", 400
+
+        resized_path = os.path.join(app.config['UPLOAD_FOLDER'], f"resized_{filename}")
+        with Image.open(original_path) as img:
+            img = img.resize((width, height))
+            img.save(resized_path)
+
+        resized_size_kb = os.path.getsize(resized_path) / 1024
+
+        return render_template('resize/resize.html', filename=filename, width=width, height=height,
+                       resized=True, resized_size=round(resized_size_kb, 2),
+                       resized_image=f"resized_{filename}")
+
+    return render_template('resize/resize.html', resized=False)
+
 
 @app.route('/upload', methods=['POST'])
 def upload_file():
-    if 'file' not in request.files:
-        return "No file uploaded", 400
+    """Handle file upload and redirect to filters page."""
+    file = request.files.get('file')
 
-    file = request.files['file']
-    if file.filename == '':
-        return "No file selected", 400
+    # Validasi file
+    if not file or file.filename == '':
+        return "No file uploaded or file name empty", 400
+    if not allowed_file(file.filename):
+        return "File type not allowed", 400
 
-    original_path = os.path.join(app.config['UPLOAD_FOLDER'], file.filename)
-    file.save(original_path)
+    # Simpan file secara aman
+    filename = secure_filename(file.filename)
+    file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+    file.save(file_path)
 
-    # Calculate the file size in KB
-    original_size_kb = os.path.getsize(original_path) / 1024  # KB
-    print(f"File size before compression: {original_size_kb:.2f} KB")
+    # Pindah ke halaman filters dan kirimkan nama file yang diupload
+    return render_template('filter/filters.html', original=filename, filtered=None)
 
-    # Calculate the compression options dynamically based on original size
-    compression_options = {}
-    for percent in [20, 30, 40, 50, 60, 70, 80, 90, 95]:
-        target_size_kb = original_size_kb * (percent / 100)
-        compression_options[f"{percent}%"] = round(target_size_kb / 1024, 2)  # Convert to MB for display
 
-    # Add fixed options if they are smaller than or equal to the original size
-    fixed_options = {}
-    possible_fixed_options = {
-        "100 KB": 0.1,
-        "200 KB": 0.2,
-        "300 KB": 0.3,
-        "400 KB": 0.4,
-        "500 KB": 0.5,
-        "600 KB": 0.6,
-        "700 KB": 0.7,
-        "800 KB": 0.8,
-        "900 KB": 0.9,
-        "1 MB": 1,
-        "2 MB": 2,
-        "3 MB": 3,
-        "4 MB": 4,
-        "5 MB": 5,
-        "6 MB": 6,
-        "7 MB": 7,
-        "8 MB": 8,
-        "9 MB": 9,
-        "10 MB": 10,
-        "12 MB": 12,
-        "15 MB": 15,
-        "20 MB": 20
-    }
-
-    for label, size_mb in possible_fixed_options.items():
-        if size_mb * 1024 <= original_size_kb:  # Only include options <= original size
-            fixed_options[label] = size_mb
-
-    # Render the template with calculated options
-    return render_template('choose_compression.html', 
-                           file_size=original_size_kb, 
-                           compression_options=compression_options, 
-                           fixed_options=fixed_options,
-                           filename=file.filename)
-
+# -------------------
+# Fitur Download File
+# -------------------
 @app.route('/uploads/<filename>')
 def uploaded_file(filename):
+    """Endpoint untuk mengunduh file."""
     return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
 
-@app.route('/compress', methods=['POST'])
-def compress_image():
-    # Get the target size selected by the user (in MB)
-    target_size_mb = float(request.form['target_size_mb'])
-    target_size_kb = int(target_size_mb * 1024)  # Convert MB to KB
-    filename = request.form['filename']
 
-    original_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-    optimized_path = os.path.join(app.config['UPLOAD_FOLDER'], 'optimized_' + filename)
+@app.route('/filters', methods=['GET', 'POST'])
+def apply_filter():
+    """Halaman untuk fitur filter gambar."""
+    if request.method == 'POST':
+        file = request.files.get('file')
+        selected_filter = request.form.get('filter')
 
-    # Perform the compression based on the selected target size
-    output_path = optimize_image(original_path, optimized_path, target_size_kb)
+        # Debugging: Cek apakah file dan filter tersedia
+        if not file:
+            print("DEBUG: No file uploaded")
+            return "No file uploaded or file name empty", 400
+        if not allowed_file(file.filename):
+            print("DEBUG: File type not allowed")
+            return "File type not allowed", 400
+        if not selected_filter:
+            print("DEBUG: No filter selected")
+            return "No filter selected", 400
 
-    # Calculate final compressed file size in KB and MB
-    compressed_size_kb = os.path.getsize(output_path) / 1024
-    compressed_size_mb = compressed_size_kb / 1024
+        # Simpan file yang diunggah
+        filename = secure_filename(file.filename)
+        original_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        file.save(original_path)
+        print(f"DEBUG: File uploaded and saved at {original_path}")
 
-    # Pass the compressed size to the template along with the download
-    return render_template('download.html',
-                           compressed_file='optimized_' + filename,
-                           compressed_size_kb=compressed_size_kb,
-                           compressed_size_mb=compressed_size_mb,
-                           original_size_kb=target_size_kb)
+        # Terapkan filter
+        try:
+            with Image.open(original_path) as img:
+                img = img.convert('RGB')  # Konversi ke RGB untuk kompatibilitas
+                print(f"DEBUG: Opened image: {original_path}")
 
+                if selected_filter == 'blur':
+                    print("DEBUG: Applying blur filter")
+                    img = blur_divide_and_conquer(img)
+                elif selected_filter == 'grayscale':
+                    print("DEBUG: Applying grayscale filter")
+                    img = grayscale_iterative(img)
+                elif selected_filter == 'sharpen':
+                    print("DEBUG: Applying sharpen filter")
+                    img = sharpen_divide_and_conquer(img)
+                elif selected_filter == 'sepia':
+                    print("DEBUG: Applying sepia filter")
+                    img = sepia_iterative(img)
+                elif selected_filter == 'edge_detection':
+                    print("DEBUG: Applying edge detection filter")
+                    img = edge_detection_dp(img)
+                elif selected_filter == 'selective_filter':
+                    print("DEBUG: Applying selective filter")
+                    target_color = (0, 0, 255)  # Contoh warna biru
+                    replacement_color = (255, 0, 0)  # Contoh warna merah
+                    img = selective_filter_backtracking(img, target_color, replacement_color)
+                else:
+                    print(f"DEBUG: Unknown filter selected: {selected_filter}")
+                    return "Invalid filter selected", 400
 
-if __name__ == "__main__":
+                # Simpan gambar hasil filter
+                filtered_filename = f"filtered_{filename}"
+                filtered_path = os.path.join(app.config['OUTPUT_FOLDER'], filtered_filename)
+                img.save(filtered_path)
+                print(f"DEBUG: Filtered image saved at {filtered_path}")
+
+        except Exception as e:
+            print(f"DEBUG: Error applying filter: {str(e)}")
+            return f"Error applying filter: {str(e)}", 500
+
+        return render_template(
+            'filter/filters.html',
+            original=filename,
+            filtered=filtered_filename,
+        )
+
+    return render_template('filter/filters.html', original=None, filtered=None)
+
+if __name__ == '__main__':
     app.run(debug=True)
