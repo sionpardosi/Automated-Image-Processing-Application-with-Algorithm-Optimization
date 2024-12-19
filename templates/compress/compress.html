@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ImageOptimize - Compress Image</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8f9fa;
+            color: #343a40;
+        }
+
+        .navbar {
+            background-color: #ffffff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .navbar-nav .nav-link {
+            font-weight: 600;
+            transition: color 0.3s ease;
+        }
+
+        .navbar-nav .nav-link:hover {
+            color: #0d6efd;
+        }
+
+        .form-container {
+            background: #ffffff;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-container h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: #0d6efd;
+        }
+
+        .alert-custom {
+            background-color: #e9f7fe;
+            color: #31708f;
+            border: 1px solid #bce8f1;
+            border-radius: 5px;
+            padding: 10px;
+        }
+
+        .btn-primary {
+            background-color: #0d6efd;
+            border: none;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            background-color: #004085;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 20px;
+            background-color: #0d6efd;
+            color: #ffffff;
+            margin-top: 30px;
+        }
+
+        .footer a {
+            color: #ffffff;
+            text-decoration: underline;
+        }
+
+        .footer a:hover {
+            text-decoration: none;
+        }
+
+        .page-title {
+            font-size: 3rem;
+            font-weight: 700;
+            color: #0d6efd;
+            text-align: center;
+            margin-top: 50px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Logo" height="40">
+                <span class="ms-3">ImageOptimize</span>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/compress">Compress</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/resize">Resize</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('apply_filter') }}">Filters</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container mt-5">
+        <!-- Title outside of card -->
+        <div class="page-title">
+            Optimize Your Image
+        </div>
+
+        <div class="form-container mx-auto" style="max-width: 600px;">
+            <form action="{{ url_for('compress') }}" method="POST" enctype="multipart/form-data" class="form">
+                <div class="mb-3">
+                    <label for="file" class="form-label">Choose an image:</label>
+                    <input type="file" name="file" class="form-control" id="file" required>
+                </div>
+                <div class="alert alert-custom" role="alert">
+                    The system will automatically compress the image to your specified size.
+                </div>
+                <div class="text-center">
+                    <button type="submit" class="btn btn-primary">Optimize Image</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer" style="margin-top: 425px;">
+        <p>&copy; 2024 ImageOptimize. Built with ❤️ by <a href="#">Kelompok 2</a>.</p>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js"></script>
+</body>
+</html>
