@@ -1,6 +1,5 @@
 # Automated Image Processing Application with Algorithm Optimization 
 
-on progress
 
 ### <summary><strong>Tools:</strong></summary>
 <p>
