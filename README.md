@@ -77,6 +77,3 @@ With the rapid growth of digital technology, the need for quick and efficient im
 3. Run the application::
    ```bash
    python app.py
-
-
-   
