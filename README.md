@@ -1,4 +1,4 @@
-# Automated Image Processing Application with Algorithm Optimization - on progress
+# Automated Image Processing Application with Algorithm Optimization 
 
 on progress
 
