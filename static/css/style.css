@@ -1,0 +1,294 @@
+/* Import Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&family=Roboto:wght@300;400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@700&family=Pacifico&display=swap');
+
+
+/* Background Gradient Pastel yang Halus */
+body {
+    font-family: 'Roboto', sans-serif;
+    margin: 0;
+    padding: 0;
+    background: linear-gradient(135deg, #fdfcfb, #e2d1c3, #d7e3fc);
+    background-size: 200% 250%;
+    animation: gradientAnimation 10s ease infinite;
+    color: #4d4d4d;
+}
+
+.image-preview{
+    width: 25rem;
+}
+
+/* Navbar Tetap di Atas */
+.navbar {
+    width: 100%;
+    padding: 1.5rem 0;
+    background-color: rgba(0, 123, 255, 0.6);
+    color: white;
+    font-size: 24px;
+    font-weight: 600;
+    text-align: center;
+    position: fixed;
+    top: 0;
+    left: 0;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    z-index: 10;
+    backdrop-filter: blur(10px);
+    font-family: 'Poppins', sans-serif;
+}
+
+/* Container Utama */
+.container {
+    max-width: 900px;
+    margin: 90px auto;
+    padding: 30px 15px;
+}
+
+/* Judul Utama */
+h1 {
+    color: #333;
+    font-size: 2.5rem;
+    text-align: center;
+    margin-bottom: 20px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    font-family: 'Pacifico', cursive;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+
+    animation: fadeIn 1.5s ease-in-out;
+}
+
+
+/* Glassmorphism pada Form */
+form {
+    max-width: 500px;
+    margin: 20px auto;
+    padding: 25px;
+    background: rgba(255, 255, 255, 0.85);
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(15px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    transition: transform 0.3s ease;
+    animation: slideUp 1s ease;
+}
+
+/* Efek Hover untuk Form */
+form:hover {
+    transform: scale(1.02);
+}
+
+/* Font dan Warna Label dan Input Form */
+label {
+    display: block;
+    font-weight: 500;
+    margin-top: 15px;
+    color: #5a5a5a;
+    font-family: 'Roboto', sans-serif;
+}
+
+input[type="file"],
+input[type="number"] {
+    width: 100%;
+    padding: 10px;
+    margin-top: 8px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    background-color: #f8fafc;
+    transition: border-color 0.3s;
+}
+
+/* Fokus pada Input */
+input[type="file"]:focus,
+input[type="number"]:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 8px rgba(0, 123, 255, 0.3);
+    outline: none;
+}
+
+/* Tombol dengan Ripple Effect */
+button[type="submit"] {
+    width: 100%;
+    padding: 12px;
+    margin-top: 20px;
+    background-image: linear-gradient(to right, #edc29f, #f3ecd0);
+    color: #ffffff;
+    font-size: 18px;
+    font-weight: 600;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    z-index: 1;
+    transition: box-shadow 0.3s ease;
+    font-family: 'Poppins', sans-serif;
+}
+
+button[type="submit"]:hover {
+    box-shadow: 0 6px 15px rgba(187, 151, 104, 0.4);
+}
+
+/* Ripple Effect pada Button */
+button[type="submit"]::after {
+    content: "";
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.4) 10%, transparent 10.01%);
+    background-position: center;
+    transition: background 0.6s;
+    z-index: -1;
+}
+
+button[type="submit"]:active::after {
+    background-size: 100%;
+    background-position: center;
+    transition: background 0s;
+}
+
+/* Custom Card Style */
+.custom-card {
+    width: 18rem; /* Atur lebar card */
+    height: 24rem; /* Atur tinggi card */
+    border-radius: 12px; /* Membuat sudut membulat */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Tambahkan bayangan */
+    overflow: hidden; /* Mencegah elemen keluar dari card */
+    transition: transform 0.3s ease; /* Animasi pada hover */
+}
+
+.custom-card img {
+    height: 7rem; /* Atur tinggi gambar */
+    object-fit: cover; /* Gambar tetap proporsional */
+}
+
+/* Hilangkan gaya default tautan */
+.card-link {
+    text-decoration: none; /* Hilangkan garis bawah */
+    color: inherit; /* Ikuti warna teks default */
+}
+
+.card-link:hover .custom-card {
+    transform: scale(1.05); /* Perbesar saat hover */
+}
+
+.custom-card:hover {
+    transform: scale(1.05); /* Perbesar sedikit saat hover */
+}
+
+/* Responsiveness */
+@media (max-width: 768px) {
+    .custom-card {
+        width: 100%; /* Card penuh untuk perangkat kecil */
+    }
+}
+
+
+
+/* Tooltip Kustom */
+.tooltip {
+    position: relative;
+    display: inline-block;
+    cursor: pointer;
+}
+
+.tooltip .tooltip-text {
+    visibility: hidden;
+    width: 140px;
+    background-color: #007bff;
+    color: #fff;
+    text-align: center;
+    padding: 8px;
+    border-radius: 4px;
+    position: absolute;
+    z-index: 1;
+    bottom: 125%;
+    left: 50%;
+    transform: translateX(-50%);
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.tooltip:hover .tooltip-text {
+    visibility: visible;
+    opacity: 1;
+}
+
+/* Animasi */
+@keyframes gradientAnimation {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+@keyframes fadeIn {
+    0% { opacity: 0; }
+    100% { opacity: 1; }
+}
+
+@keyframes slideUp {
+    0% { transform: translateY(20px); opacity: 0; }
+    100% { transform: translateY(0); opacity: 1; }
+}
+
+.mt{
+    margin-top: 100px;
+}
+
+
+.form{
+    background-color: rgb(255, 247, 236);
+}
+
+/* Header Styling */
+header {
+    background-color: #ffe0ae; /* Warna latar */
+    padding: 0; /* Menambah jarak atas dan bawah pada header */
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* Bayangan halus di bawah header */
+    
+    
+}
+
+/* Kontainer Header */
+header .container {
+    display: flex;
+    align-items: center; /* Elemen dalam header rata tengah vertikal */
+    justify-content: space-between; /* Elemen tersebar antara kiri dan kanan */
+    margin: 0;
+    
+}
+
+/* Logo dan Nama Brand */
+.navbar-brand {
+    font-family: 'Pacifico', cursive;
+    font-size: 24px;
+    color: #4a69bd;
+    display: flex;
+    align-items: center; /* Rata tengah antara logo dan teks */
+    gap: 10px; /* Jarak antara logo dan teks */
+    
+}
+
+/* Menu Navigasi */
+.navbar-nav .nav-link {
+    font-size: 16px;
+    color: #5a5a5a;
+    transition: color 0.3s ease;
+    margin-left: 15px; /* Jarak horizontal antar menu */
+    
+}
+
+.navbar-nav .nav-link:hover {
+    color: #4a69bd; /* Warna biru saat hover */
+    
+}
+
+.navbar-nav .nav-link.active {
+    color: #4a69bd;
+    font-weight: bold;
+    
+}
+
+/* Jarak Header dari Konten */
+header + .container {
+    margin-top: 10px; /* Jarak antara header dan konten utama */
+}
